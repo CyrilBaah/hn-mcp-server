@@ -1,0 +1,163 @@
+{
+  "contracts": [
+    {
+      "name": "search_hn",
+      "file": "search-hn.json"
+    },
+    {
+      "name": "search_hn_by_date",
+      "file": "search-hn-by-date.json"
+    },
+    {
+      "name": "get_front_page",
+      "description": "Get current HackerNews front page stories",
+      "delegates_to": "search_hn",
+      "fixed_params": {
+        "tags": ["front_page"]
+      }
+    },
+    {
+      "name": "get_latest_stories",
+      "description": "Get most recent stories",
+      "delegates_to": "search_hn_by_date",
+      "fixed_params": {
+        "tags": ["story"]
+      }
+    },
+    {
+      "name": "get_latest_comments",
+      "description": "Get most recent comments",
+      "delegates_to": "search_hn_by_date",
+      "fixed_params": {
+        "tags": ["comment"]
+      }
+    },
+    {
+      "name": "get_item",
+      "file": "get-item.json"
+    },
+    {
+      "name": "get_story_comments",
+      "description": "Get story with all comments (alias for get_item)",
+      "delegates_to": "get_item"
+    },
+    {
+      "name": "get_user",
+      "file": "get-user.json"
+    },
+    {
+      "name": "get_user_stories",
+      "description": "Get all stories submitted by a user",
+      "delegates_to": "search_hn",
+      "dynamic_params": {
+        "tags": ["story", "author_{username}"]
+      }
+    },
+    {
+      "name": "get_user_comments",
+      "description": "Get all comments by a user",
+      "delegates_to": "search_hn",
+      "dynamic_params": {
+        "tags": ["comment", "author_{username}"]
+      }
+    },
+    {
+      "name": "search_by_time_range",
+      "description": "Search items within a specific time range",
+      "delegates_to": "search_hn_by_date",
+      "dynamic_params": {
+        "numeric_filters": ["created_at_i>{start_timestamp}", "created_at_i<{end_timestamp}"]
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start_timestamp": {
+            "type": "integer",
+            "description": "Start time (Unix timestamp)",
+            "minimum": 0
+          },
+          "end_timestamp": {
+            "type": "integer",
+            "description": "End time (Unix timestamp)",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string",
+            "default": ""
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "hits_per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 20
+          }
+        },
+        "required": ["start_timestamp", "end_timestamp"]
+      }
+    },
+    {
+      "name": "search_by_metrics",
+      "description": "Search items with minimum points or comments",
+      "delegates_to": "search_hn",
+      "dynamic_params": {
+        "numeric_filters": ["points>={min_points}", "num_comments>={min_comments}"]
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "min_points": {
+            "type": "integer",
+            "description": "Minimum points",
+            "minimum": 0
+          },
+          "min_comments": {
+            "type": "integer",
+            "description": "Minimum number of comments",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string",
+            "default": ""
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "hits_per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 20
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "mcp_version": "2024-11-05",
+    "total_tools": 13,
+    "description": "MCP tool contracts for HackerNews API server"
+  }
+}

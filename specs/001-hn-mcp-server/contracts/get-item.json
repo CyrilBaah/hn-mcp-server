@@ -1,0 +1,60 @@
+{
+  "tool": "get_item",
+  "description": "Retrieve a specific HackerNews item (story, comment, poll, etc.) by ID with nested children",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "item_id": {
+        "type": "integer",
+        "description": "HackerNews item ID",
+        "minimum": 1
+      }
+    },
+    "required": ["item_id"]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "author": {
+        "type": "string"
+      },
+      "title": {
+        "type": ["string", "null"]
+      },
+      "url": {
+        "type": ["string", "null"]
+      },
+      "text": {
+        "type": ["string", "null"]
+      },
+      "points": {
+        "type": ["integer", "null"]
+      },
+      "parent_id": {
+        "type": ["integer", "null"]
+      },
+      "children": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": ["id", "created_at", "author", "children"]
+  },
+  "examples": [
+    {
+      "input": {
+        "item_id": 39251790
+      },
+      "description": "Get item with all nested comments"
+    }
+  ]
+}

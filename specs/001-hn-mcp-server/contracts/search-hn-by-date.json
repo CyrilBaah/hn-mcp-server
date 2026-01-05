@@ -1,0 +1,90 @@
+{
+  "tool": "search_hn_by_date",
+  "description": "Search HackerNews content sorted by date (most recent first)",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Full-text search query",
+        "default": ""
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Filter tags",
+        "default": []
+      },
+      "page": {
+        "type": "integer",
+        "description": "Page number (0-indexed)",
+        "minimum": 0,
+        "default": 0
+      },
+      "hits_per_page": {
+        "type": "integer",
+        "description": "Results per page",
+        "minimum": 1,
+        "maximum": 1000,
+        "default": 20
+      },
+      "numeric_filters": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Numeric filters",
+        "default": []
+      }
+    },
+    "required": []
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "hits": {
+        "type": "array"
+      },
+      "page": {
+        "type": "integer"
+      },
+      "nbHits": {
+        "type": "integer"
+      },
+      "nbPages": {
+        "type": "integer"
+      },
+      "hitsPerPage": {
+        "type": "integer"
+      },
+      "processingTimeMS": {
+        "type": "integer"
+      },
+      "query": {
+        "type": "string"
+      },
+      "params": {
+        "type": "string"
+      }
+    },
+    "required": ["hits", "page", "nbHits", "nbPages", "hitsPerPage", "processingTimeMS", "query", "params"]
+  },
+  "examples": [
+    {
+      "input": {
+        "tags": ["story"],
+        "hits_per_page": 30
+      },
+      "description": "Get 30 most recent stories"
+    },
+    {
+      "input": {
+        "tags": ["comment"],
+        "numeric_filters": ["created_at_i>1704067200"]
+      },
+      "description": "Comments since Jan 1, 2024"
+    }
+  ]
+}

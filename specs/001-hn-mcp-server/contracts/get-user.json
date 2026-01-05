@@ -1,0 +1,47 @@
+{
+  "tool": "get_user",
+  "description": "Retrieve HackerNews user profile information",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "username": {
+        "type": "string",
+        "description": "HackerNews username",
+        "minLength": 1
+      }
+    },
+    "required": ["username"]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "username": {
+        "type": "string"
+      },
+      "about": {
+        "type": ["string", "null"]
+      },
+      "karma": {
+        "type": "integer"
+      },
+      "created": {
+        "type": ["string", "null"]
+      }
+    },
+    "required": ["username", "karma"]
+  },
+  "examples": [
+    {
+      "input": {
+        "username": "pg"
+      },
+      "description": "Get Paul Graham's profile"
+    },
+    {
+      "input": {
+        "username": "dang"
+      },
+      "description": "Get moderator dang's profile"
+    }
+  ]
+}

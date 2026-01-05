@@ -1,50 +1,117 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# HN MCP Server Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality First
+- Prioritize existing packages and libraries over custom implementations
+- Leverage battle-tested solutions from npm/PyPI ecosystem
+- Always use the latest stable package versions
+- Custom code requires justification: performance, security, or unique requirements
+- Code must be self-documenting with clear naming conventions
+- Follow established design patterns and best practices for the technology stack
+- **Python**: Ruff for linting and formatting (replaces Black, isort, Flake8, pylint)
+- **Python**: Ruff configuration in `pyproject.toml` with strict rules enabled
+- All code must pass Ruff checks before commit
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Test-First Development (NON-NEGOTIABLE)
+- TDD mandatory: Tests written → User approved → Tests fail → Implementation begins
+- Red-Green-Refactor cycle strictly enforced
+- Minimum 80% code coverage required
+- Tests must cover: happy paths, edge cases, error handling
+- Integration tests required for: API endpoints, external dependencies, data transformations
+- Test failures block all deployments
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Documentation via Context7
+- All documentation must be created and maintained through Context7
+- API documentation auto-generated from code annotations
+- Include examples for all public interfaces
+- Architecture decisions recorded in ADRs (Architecture Decision Records)
+- Onboarding documentation kept current
+- Documentation changes reviewed alongside code changes
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. User Experience Consistency
+- Consistent error messages across all interfaces
+- Standardized response formats (JSON for APIs, structured output for CLI)
+- Clear, actionable error messages with resolution steps
+- Uniform naming conventions across APIs and data models
+- Accessible interfaces following WCAG 2.1 AA standards
+- Performance budgets: API responses < 200ms p95, UI interactions < 100ms
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Dependency Management
+- Always use latest stable versions of dependencies
+- Security patches applied within 48 hours
+- Major version upgrades evaluated monthly
+- Dependencies reviewed for: active maintenance, security track record, bundle size
+- Lock files committed to version control
+- Automated dependency updates via Dependabot or Renovate
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### VI. Sample Code & Reference Implementations
+- Prefer copying from official package examples over custom solutions
+- Maintain internal code snippet library for common patterns
+- Reference implementations must include: usage examples, error handling, tests
+- Document source of borrowed code patterns
+- Adapt, don't reinvent: modify existing patterns to fit needs
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Quality Standards
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Code Review Requirements
+- All code changes require peer review
+- Reviewers verify: test coverage, documentation updates, principle adherence
+- No direct commits to main branch
+- PR descriptions must link to related issues/specs
+- Breaking changes require explicit approval and migration plan
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Testing Gates
+- Unit tests pass locally before PR creation
+- Integration tests pass in CI/CD pipeline
+- E2E tests pass for user-facing changes
+- Performance regression tests for critical paths
+- Security scanning (SAST/DAST) passes with no high/critical issues
+- Ruff linting and formatting checks pass in CI/CD (Python projects)
+- Pre-commit hooks enforce Ruff formatting before commits
+
+### Performance Standards
+- Monitor bundle size: flag increases > 10%
+- Lighthouse scores: Performance > 90, Accessibility > 95
+- API response time p95 < 200ms
+- Database query optimization required for N+1 patterns
+## Technology Constraints
+
+### Package Selection Criteria
+- Active maintenance (updated within last 6 months)
+- Strong community support (> 1000 weekly downloads for npm, > 10k monthly for PyPI)
+- TypeScript support (types included or @types/* available)
+- Python type hints and py.typed marker for libraries
+- Compatible license (MIT, Apache 2.0, BSD)
+- Security audit passed within last year
+
+### Python Standards
+- Ruff as the single tool for linting and formatting
+- Target Python 3.11+ for new projects
+- Type hints required for all function signatures
+- mypy in strict mode for type checking
+- pytest for testing framework
+- Pre-commit hooks configured with Ruff@types/* available)
+- Compatible license (MIT, Apache 2.0, BSD)
+- Security audit passed within last year
+
+### Version Control
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- CHANGELOG.md updated for every release
+- Git tags for all releases
+- Breaking changes require major version bump
+- Feature branches named: feature/description, fix/description, docs/description
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices. All code changes must demonstrate compliance with these principles. When complexity is unavoidable, it must be documented and justified.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Amendments to this constitution require:
+1. Documented proposal with rationale
+2. Team consensus approval
+3. Migration plan for existing code (if applicable)
+4. Version bump and changelog entry
+
+All pull requests and code reviews must verify compliance with this constitution. Use Context7 for runtime development guidance and documentation standards.
+
+**Version**: 1.0.0 | **Ratified**: 2025-01-05 | **Last Amended**: 2025-01-05
