@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "hackernews": {
+      "command": "python",
+      "args": ["-m", "hn_mcp_server.server"],
+      "env": {}
+    }
+  }
+}
