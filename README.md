@@ -1,0 +1,350 @@
+# HackerNews MCP Server
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A Model Context Protocol (MCP) server that provides programmatic access to HackerNews content through the official [HN Algolia API](https://hn.algolia.com/api). This enables AI assistants and other MCP clients to search, retrieve, and analyze HackerNews stories, comments, and user profiles.
+
+## Features
+
+- 🔍 **Comprehensive Search**: Search HackerNews by relevance or date with advanced filtering
+- 📰 **Content Access**: Retrieve stories, comments, and polls with full metadata
+- 👤 **User Profiles**: Access user information, submissions, and comment history
+- ⚡ **High Performance**: Async/await design with connection pooling and retry logic
+- 🛡️ **Type Safe**: Full Pydantic validation and type hints throughout
+- 🔧 **MCP Compatible**: Works with Claude Desktop, Continue, and other MCP clients
+
+## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install hn-mcp-server
+```
+
+### From Source
+
+```bash
+git clone https://github.com/yourusername/hn-mcp-server.git
+cd hn-mcp-server
+pip install -e .
+```
+
+### Development Installation
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Quick Start
+
+### With Claude Desktop
+
+Add to your Claude Desktop configuration file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "hackernews": {
+      "command": "python",
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop, and the HackerNews tools will be available.
+
+### Standalone Usage
+
+```python
+import asyncio
+from hn_mcp_server.services import HNClient
+
+async def main():
+    async with HNClient() as client:
+        # Search for Python stories
+        result = await client.search(
+            query="python",
+            tags=["story"],
+            hits_per_page=10
+        )
+        
+        for hit in result.hits:
+            print(f"{hit.title} - {hit.points} points")
+
+asyncio.run(main())
+```
+
+## Available Tools
+
+### Search Tools
+
+#### `search_hn`
+Search HackerNews content by relevance (sorted by relevance → points → comments).
+
+```json
+{
+  "query": "artificial intelligence",
+  "tags": ["story"],
+  "hits_per_page": 20
+}
+```
+
+#### `search_hn_by_date`
+Search HackerNews content by date (most recent first).
+
+```json
+{
+  "query": "python",
+  "tags": ["story", "show_hn"],
+  "hits_per_page": 10
+}
+```
+
+#### `get_front_page`
+Retrieve current HackerNews front page stories.
+
+```json
+{
+  "page": 0,
+  "hits_per_page": 30
+}
+```
+
+#### `get_latest_stories`
+Retrieve most recent HackerNews stories.
+
+```json
+{
+  "hits_per_page": 20
+}
+```
+
+#### `get_latest_comments`
+Retrieve most recent HackerNews comments.
+
+```json
+{
+  "hits_per_page": 20
+}
+```
+
+#### `search_by_time_range`
+Search items within a specific time range.
+
+```json
+{
+  "start_timestamp": 1704067200,
+  "end_timestamp": 1736078400,
+  "query": "AI",
+  "hits_per_page": 10
+}
+```
+
+#### `search_by_metrics`
+Search items with minimum points or comments.
+
+```json
+{
+  "min_points": 100,
+  "min_comments": 50,
+  "tags": ["story"]
+}
+```
+
+### Item Tools
+
+#### `get_item`
+Retrieve a specific item (story, comment, poll) by ID.
+
+```json
+{
+  "item_id": 1
+}
+```
+
+#### `get_story_comments`
+Retrieve a story and all its comments (full tree).
+
+```json
+{
+  "story_id": 39195605
+}
+```
+
+### User Tools
+
+#### `get_user`
+Retrieve user profile information.
+
+```json
+{
+  "username": "pg"
+}
+```
+
+#### `get_user_stories`
+Retrieve all stories submitted by a user.
+
+```json
+{
+  "username": "pg",
+  "hits_per_page": 20
+}
+```
+
+#### `get_user_comments`
+Retrieve all comments by a user.
+
+```json
+{
+  "username": "pg",
+  "hits_per_page": 20
+}
+```
+
+## Configuration
+
+Configure via environment variables:
+
+```bash
+# API Configuration
+export HN_API_BASE_URL="https://hn.algolia.com/api/v1"  # Default
+export HN_REQUEST_TIMEOUT="10"  # Seconds, default: 10
+export HN_MAX_RETRIES="3"  # Default: 3
+
+# Logging
+export LOG_LEVEL="INFO"  # DEBUG, INFO, WARNING, ERROR
+```
+
+## Search Tags
+
+Available tags for filtering:
+
+- **Type**: `story`, `comment`, `poll`, `pollopt`
+- **Special**: `show_hn`, `ask_hn`, `front_page`
+- **Author**: `author_USERNAME` (e.g., `author_pg`)
+- **Story**: `story_ID` (e.g., `story_12345`)
+
+## Numeric Filters
+
+Filter by numeric fields:
+
+- `created_at_i` - Unix timestamp
+- `points` - Story points
+- `num_comments` - Number of comments
+
+Operators: `<`, `<=`, `=`, `>`, `>=`
+
+Examples:
+- `points>100` - Stories with more than 100 points
+- `created_at_i>1704067200` - Items after Jan 1, 2024
+- `num_comments>=50` - Items with 50+ comments
+
+## Examples
+
+See the [examples/](examples/) directory for more usage examples:
+
+- [`basic_usage.py`](examples/basic_usage.py) - MCP client usage
+- [`direct_api_usage.py`](examples/direct_api_usage.py) - Direct API client usage
+- [`mcp_config.json`](examples/mcp_config.json) - Claude Desktop configuration
+
+## Development
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/hn-mcp-server.git
+cd hn-mcp-server
+
+# Install dependencies
+pip install -e ".[dev]"
+```
+
+### Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run unit tests only
+pytest tests/unit/
+
+# Run with coverage
+pytest --cov=hn_mcp_server --cov-report=html
+
+# Run integration tests (requires internet)
+pytest tests/integration/ -m integration
+```
+
+### Linting & Formatting
+
+```bash
+# Format code
+ruff format .
+
+# Lint code
+ruff check .
+
+# Type checking
+mypy src/
+```
+
+## Architecture
+
+```
+hn-mcp-server/
+├── src/hn_mcp_server/
+│   ├── server.py          # MCP server setup
+│   ├── models/            # Pydantic data models
+│   ├── services/          # API client & rate limiting
+│   └── tools/             # MCP tool implementations
+├── tests/
+│   ├── unit/              # Unit tests
+│   ├── integration/       # Integration tests
+│   └── contract/          # MCP protocol tests
+└── examples/              # Usage examples
+```
+
+## API Rate Limits
+
+The HackerNews API has a rate limit of **10,000 requests/hour per IP**. The client includes built-in rate limiting to stay within these bounds.
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [HackerNews](https://news.ycombinator.com/) for the API
+- [Algolia](https://www.algolia.com/) for powering the HN search
+- [Model Context Protocol](https://modelcontextprotocol.io/) specification
+
+## Support
+
+- 📖 [Documentation](docs/DOCUMENTATION.md)
+- 🚀 [Quick Start Guide](docs/QUICKSTART.md)
+- 🐛 [Issue Tracker](https://github.com/yourusername/hn-mcp-server/issues)
+- 💬 [Discussions](https://github.com/yourusername/hn-mcp-server/discussions)
+
+---
+
+**Note**: This is an unofficial third-party client and is not affiliated with Y Combinator or HackerNews.

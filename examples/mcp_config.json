@@ -2,8 +2,13 @@
   "mcpServers": {
     "hackernews": {
       "command": "python",
-      "args": ["-m", "hn_mcp_server.server"],
-      "env": {}
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO",
+        "HN_API_BASE_URL": "https://hn.algolia.com/api/v1",
+        "HN_REQUEST_TIMEOUT": "10",
+        "HN_MAX_RETRIES": "3"
+      }
     }
   }
 }
