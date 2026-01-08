@@ -39,9 +39,6 @@ build: clean  ## Build package
 check-dist:  ## Check distribution files
 	twine check dist/*
 
-publish-test: build check-dist  ## Publish to TestPyPI
-	twine upload --repository testpypi dist/*
-
 publish: build check-dist  ## Publish to PyPI
 	@echo "⚠️  You are about to publish to PyPI. Are you sure? [y/N]" && read ans && [ $${ans:-N} = y ]
 	twine upload dist/*

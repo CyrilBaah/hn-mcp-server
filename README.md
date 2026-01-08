@@ -529,14 +529,10 @@ If you encounter API errors:
 Use the release script for automated publishing:
 
 ```bash
-# Publish to TestPyPI (for testing)
-python scripts/release.py 1.0.1 --test
-
 # Publish to PyPI (production)
 python scripts/release.py 1.0.1
 
 # Or using Make
-make publish-test  # TestPyPI
 make publish       # PyPI
 ```
 
@@ -572,17 +568,12 @@ See [docs/PUBLISHING.md](docs/PUBLISHING.md) for detailed instructions.
    twine check dist/*
    ```
 
-5. **Upload to TestPyPI** (optional, for testing):
-   ```bash
-   twine upload --repository testpypi dist/*
-   ```
-
-6. **Upload to PyPI**:
+5. **Upload to PyPI**:
    ```bash
    twine upload dist/*
    ```
 
-7. **Create a git tag**:
+6. **Create a git tag**:
    ```bash
    git tag -a v1.0.1 -m "Release version 1.0.1"
    git push origin v1.0.1
