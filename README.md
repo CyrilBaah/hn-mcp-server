@@ -1,7 +1,11 @@
 # HackerNews MCP Server
 
+[![PyPI version](https://img.shields.io/pypi/v/hn-mcp-server.svg)](https://pypi.org/project/hn-mcp-server/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![MCP](https://img.shields.io/badge/MCP-1.0.0-green.svg)](https://modelcontextprotocol.io/)
+[![Downloads](https://img.shields.io/pypi/dm/hn-mcp-server.svg)](https://pypi.org/project/hn-mcp-server/)
 
 A Model Context Protocol (MCP) server that provides programmatic access to HackerNews content through the official [HN Algolia API](https://hn.algolia.com/api). This enables AI assistants and other MCP clients to search, retrieve, and analyze HackerNews stories, comments, and user profiles.
 
