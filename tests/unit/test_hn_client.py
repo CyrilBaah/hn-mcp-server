@@ -3,8 +3,8 @@
 import pytest
 from pytest_httpx import HTTPXMock
 
+from hn_mcp_server.models import Item, SearchResult, User
 from hn_mcp_server.services import HNClient, HNClientError
-from hn_mcp_server.models import SearchResult, Item, User
 
 
 @pytest.mark.asyncio
@@ -114,9 +114,10 @@ class TestHNClient:
 
     async def test_timeout_with_retry(self, httpx_mock: HTTPXMock):
         """Test timeout with retry logic."""
+        import httpx
         # First 2 requests timeout, 3rd succeeds
-        httpx_mock.add_exception(Exception("Timeout"))
-        httpx_mock.add_exception(Exception("Timeout"))
+        httpx_mock.add_exception(httpx.TimeoutException("Timeout"))
+        httpx_mock.add_exception(httpx.TimeoutException("Timeout"))
         httpx_mock.add_response(json={"hits": [], "page": 0, "nbHits": 0, "nbPages": 0, "hitsPerPage": 20, "processingTimeMS": 1, "query": "", "params": ""})
 
         async with HNClient(max_retries=3) as client:
@@ -125,16 +126,14 @@ class TestHNClient:
 
     async def test_max_retries_exceeded(self, httpx_mock: HTTPXMock):
         """Test max retries exceeded."""
-        # All requests timeout
-        for _ in range(4):
-            httpx_mock.add_exception(Exception("Timeout"))
+        import httpx
+        # All requests timeout (1 initial + 2 retries = 3 total attempts)
+        for _ in range(3):
+            httpx_mock.add_exception(httpx.TimeoutException("Timeout"))
 
         async with HNClient(max_retries=2, timeout=0.1) as client:
-            with pytest.raises(HNClientError) as exc_info:
+            with pytest.raises(HNClientError):
                 await client.search()
-
-            # Should eventually raise timeout error
-            # (might be wrapped in different error depending on exception type)
 
     async def test_context_manager(self, httpx_mock: HTTPXMock, sample_search_response):
         """Test async context manager."""

@@ -2,7 +2,6 @@
 
 import asyncio
 import sys
-from pathlib import Path
 
 from mcp.client import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client

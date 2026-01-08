@@ -140,7 +140,7 @@ class HNClient:
                 APIErrorResponse(
                     error=ErrorDetails(
                         code="NETWORK_ERROR",
-                        message=f"Network error: {str(e)}",
+                        message=f"Network error: {e!s}",
                         details={"endpoint": endpoint},
                     )
                 )

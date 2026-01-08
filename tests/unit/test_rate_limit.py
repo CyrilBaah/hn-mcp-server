@@ -1,8 +1,9 @@
 """Unit tests for rate limiter."""
 
 import asyncio
-import pytest
 import time
+
+import pytest
 
 from hn_mcp_server.services import RateLimiter
 
@@ -48,7 +49,7 @@ class TestRateLimiter:
 
         await limiter.acquire()
         await limiter.acquire()
-        assert limiter.get_remaining() == 3
+        assert limiter.get_remaining() == 2  # 5 - 3 = 2 remaining
 
     async def test_get_reset_time(self):
         """Test get_reset_time method."""

@@ -25,7 +25,7 @@ pip install hn-mcp-server
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/hn-mcp-server.git
+git clone https://github.com/CyrilBaah/hn-mcp-server.git
 cd hn-mcp-server
 
 # Install with pip

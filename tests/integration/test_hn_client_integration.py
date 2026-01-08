@@ -2,8 +2,8 @@
 
 import pytest
 
+from hn_mcp_server.models import Item, SearchResult, User
 from hn_mcp_server.services import HNClient
-from hn_mcp_server.models import SearchResult, Item, User
 
 
 @pytest.mark.integration

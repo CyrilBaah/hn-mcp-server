@@ -1,8 +1,11 @@
 # HackerNews MCP Server
 
+![hn-mcp-server](https://socialify.git.ci/CyrilBaah/hn-mcp-server/image?description=1&font=Raleway&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Frdimascio%2Ficons%2Frefs%2Fheads%2Fmaster%2Ficons%2Fcolor%2Fhackernews.svg&name=1&owner=1&theme=Light)
+
 [![PyPI version](https://img.shields.io/pypi/v/hn-mcp-server.svg)](https://pypi.org/project/hn-mcp-server/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/CyrilBaah/hn-mcp-server/workflows/Tests/badge.svg)](https://github.com/CyrilBaah/hn-mcp-server/actions)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![MCP](https://img.shields.io/badge/MCP-1.0.0-green.svg)](https://modelcontextprotocol.io/)
 [![Downloads](https://img.shields.io/pypi/dm/hn-mcp-server.svg)](https://pypi.org/project/hn-mcp-server/)
@@ -29,7 +32,7 @@ pip install hn-mcp-server
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/hn-mcp-server.git
+git clone https://github.com/CyrilBaah/hn-mcp-server.git
 cd hn-mcp-server
 pip install -e .
 ```
@@ -53,9 +56,66 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 
 You should see a JSON response indicating successful initialization.
 
-### With VS Code MCP Extension
+### With MCP Inspector
 
-If you're using the VS Code MCP extension, update your `.vscode/mcp.json`:
+The MCP Inspector provides a web-based interface for testing and debugging your server:
+
+```bash
+# Using npx (no installation required)
+npx @modelcontextprotocol/inspector python -m hn_mcp_server
+
+# Or install globally
+npm install -g @modelcontextprotocol/inspector
+mcp-inspector python -m hn_mcp_server
+```
+
+This will open a browser interface where you can:
+- Test all available tools interactively
+- Inspect requests and responses
+- Debug tool parameters and outputs
+- View server logs in real-time
+
+### With VS Code MCP
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-HackerNews_MCP-0098FF?style=flat-square&logo=visualstudiocode&logoColor=ffffff)](vscode:mcp/install?%7B%22name%22%3A%22microsoft.docs.mcp%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22python%22%2C%22args%22%3A%5B%22python%20-m%20hn_mcp_server%22%5D%7D)
+
+Using [vscodemcp.com](https://vscodemcp.com/), update your `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "hackernews": {
+      "command": "python",
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
+
+**Note**: If you installed in a virtual environment, use the full path to your Python executable:
+
+```json
+{
+  "servers": {
+    "hackernews": {
+      "command": "/path/to/your/venv/bin/python",
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
+
+### With Cursor
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=hn_mcp_server&config=eyJjb21tYW5kIjoibnB4IC15IGhuX21jcF9zZXJ2ZXIifQ%3D%3D)
+
+Or manually update your `.cursor/mcp.json`:
 
 ```json
 {
@@ -88,6 +148,8 @@ If you're using the VS Code MCP extension, update your `.vscode/mcp.json`:
 ```
 
 ### With Claude Desktop
+
+<img src="https://claude.ai/images/claude_app_icon.png" width="20" height="20" /> **Claude Desktop**
 
 Add to your Claude Desktop configuration file:
 
@@ -451,6 +513,93 @@ If you encounter API errors:
 2. **Rate limiting**: Wait if you've exceeded the 10,000 requests/hour limit
 3. **Invalid item ID**: Ensure the item ID exists on HackerNews
 
+## Publishing to PyPI
+
+### Prerequisites
+
+1. Install build tools:
+   ```bash
+   pip install build twine
+   ```
+
+2. Ensure you have PyPI credentials (create account at [pypi.org](https://pypi.org))
+
+### Quick Publish (Automated)
+
+Use the release script for automated publishing:
+
+```bash
+# Publish to TestPyPI (for testing)
+python scripts/release.py 1.0.1 --test
+
+# Publish to PyPI (production)
+python scripts/release.py 1.0.1
+
+# Or using Make
+make publish-test  # TestPyPI
+make publish       # PyPI
+```
+
+The script will automatically:
+- Update version numbers
+- Run tests and linting
+- Build the package
+- Create git tag
+- Publish to PyPI
+
+See [docs/PUBLISHING.md](docs/PUBLISHING.md) for detailed instructions.
+
+### Manual Build and Publish
+
+1. **Update version** in [`pyproject.toml`](pyproject.toml):
+   ```toml
+   [project]
+   version = "1.0.1"  # Increment appropriately
+   ```
+
+2. **Clean previous builds**:
+   ```bash
+   rm -rf dist/ build/ *.egg-info
+   ```
+
+3. **Build the package**:
+   ```bash
+   python -m build
+   ```
+
+4. **Check the distribution**:
+   ```bash
+   twine check dist/*
+   ```
+
+5. **Upload to TestPyPI** (optional, for testing):
+   ```bash
+   twine upload --repository testpypi dist/*
+   ```
+
+6. **Upload to PyPI**:
+   ```bash
+   twine upload dist/*
+   ```
+
+7. **Create a git tag**:
+   ```bash
+   git tag -a v1.0.1 -m "Release version 1.0.1"
+   git push origin v1.0.1
+   ```
+
+### Using API Tokens (Recommended)
+
+Instead of username/password, use API tokens:
+
+1. Generate token at [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/)
+2. Create `~/.pypirc`:
+   ```ini
+   [pypi]
+   username = __token__
+   password = pypi-AgEIcHlwaS5vcmc...
+   ```
+
 ## Contributing
 
 Contributions are welcome! Please:
@@ -475,8 +624,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 📖 [Documentation](docs/DOCUMENTATION.md)
 - 🚀 [Quick Start Guide](docs/QUICKSTART.md)
-- 🐛 [Issue Tracker](https://github.com/yourusername/hn-mcp-server/issues)
-- 💬 [Discussions](https://github.com/yourusername/hn-mcp-server/discussions)
+- 🐛 [Issue Tracker](https://github.com/CyrilBaah/hn-mcp-server/issues)
+- 💬 [Discussions](https://github.com/CyrilBaah/hn-mcp-server/discussions)
 
 ---
 

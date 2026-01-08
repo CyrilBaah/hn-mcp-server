@@ -8,7 +8,7 @@ This guide will help you get the HackerNews MCP Server up and running quickly.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/hn-mcp-server.git
+git clone https://github.com/CyrilBaah/hn-mcp-server.git
 cd hn-mcp-server
 
 # Create and activate virtual environment
@@ -26,7 +26,7 @@ pip install -e .
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and install
-git clone https://github.com/yourusername/hn-mcp-server.git
+git clone https://github.com/CyrilBaah/hn-mcp-server.git
 cd hn-mcp-server
 
 # Create venv and install

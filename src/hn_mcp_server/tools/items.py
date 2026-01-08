@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from ..services import HNClient, HNClientError
+from ..services import HNClient
 
 
 async def get_item(item_id: int) -> dict[str, Any]:

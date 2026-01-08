@@ -1,17 +1,17 @@
 """Unit tests for Pydantic models."""
 
+
 import pytest
-from datetime import datetime
 from pydantic import ValidationError
 
 from hn_mcp_server.models import (
-    Hit,
-    SearchResult,
-    SearchParams,
-    Item,
-    User,
-    ErrorDetails,
     APIErrorResponse,
+    ErrorDetails,
+    Hit,
+    Item,
+    SearchParams,
+    SearchResult,
+    User,
 )
 
 
