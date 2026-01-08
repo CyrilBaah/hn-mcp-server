@@ -1,6 +1,8 @@
 """Example: Using the HN MCP server with a custom client."""
 
 import asyncio
+import sys
+from pathlib import Path
 
 from mcp.client import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -11,8 +13,8 @@ async def main():
 
     # Configure server connection
     server_params = StdioServerParameters(
-        command="python",
-        args=["-m", "hn_mcp_server.server"],
+        command=sys.executable,  # Use current Python interpreter
+        args=["-m", "hn_mcp_server"],
     )
 
     # Connect to server

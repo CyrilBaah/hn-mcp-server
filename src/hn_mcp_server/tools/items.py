@@ -21,7 +21,7 @@ async def get_item(item_id: int) -> dict[str, Any]:
     """
     async with HNClient() as client:
         item = await client.get_item(item_id)
-        return item.model_dump(by_alias=True)
+        return item.model_dump(mode='json', by_alias=True)
 
 
 async def get_story_comments(story_id: int) -> dict[str, Any]:
@@ -43,4 +43,4 @@ async def get_story_comments(story_id: int) -> dict[str, Any]:
         if not story.is_story:
             raise ValueError(f"Item {story_id} is not a story")
 
-        return story.model_dump(by_alias=True)
+        return story.model_dump(mode='json', by_alias=True)

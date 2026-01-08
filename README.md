@@ -38,6 +38,51 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+### Testing the Server
+
+First, verify the server is working correctly:
+
+```bash
+# Test that the server responds to MCP protocol
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1.0.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | python -m hn_mcp_server
+```
+
+You should see a JSON response indicating successful initialization.
+
+### With VS Code MCP Extension
+
+If you're using the VS Code MCP extension, update your `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "hackernews": {
+      "command": "python",
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
+
+**Note**: If you installed in a virtual environment, use the full path to your Python executable:
+
+```json
+{
+  "servers": {
+    "hackernews": {
+      "command": "/path/to/your/venv/bin/python",
+      "args": ["-m", "hn_mcp_server"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
+
 ### With Claude Desktop
 
 Add to your Claude Desktop configuration file:
@@ -63,6 +108,8 @@ Restart Claude Desktop, and the HackerNews tools will be available.
 
 ### Standalone Usage
 
+The HN client can also be used directly without MCP:
+
 ```python
 import asyncio
 from hn_mcp_server.services import HNClient
@@ -81,6 +128,8 @@ async def main():
 
 asyncio.run(main())
 ```
+
+See [`examples/direct_api_usage.py`](examples/direct_api_usage.py) for more examples.
 
 ## Available Tools
 
@@ -250,11 +299,23 @@ Examples:
 
 ## Examples
 
-See the [examples/](examples/) directory for more usage examples:
+See the [examples/](examples/) directory for usage examples:
 
-- [`basic_usage.py`](examples/basic_usage.py) - MCP client usage
-- [`direct_api_usage.py`](examples/direct_api_usage.py) - Direct API client usage
+- [`direct_api_usage.py`](examples/direct_api_usage.py) - Direct API client usage without MCP
+- [`basic_usage.py`](examples/basic_usage.py) - MCP client usage (requires MCP client library)
 - [`mcp_config.json`](examples/mcp_config.json) - Claude Desktop configuration
+
+### Running Examples
+
+```bash
+# Run direct API example (no MCP client needed)
+python examples/direct_api_usage.py
+
+# Run MCP client example (requires mcp library)
+python examples/basic_usage.py
+```
+
+The direct API example demonstrates using the HackerNews client library directly, while the basic usage example shows how to interact with the MCP server programmatically.
 
 ## Development
 
@@ -265,8 +326,22 @@ See the [examples/](examples/) directory for more usage examples:
 git clone https://github.com/yourusername/hn-mcp-server.git
 cd hn-mcp-server
 
-# Install dependencies
+# Create virtual environment (recommended)
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install in development mode with dev dependencies
 pip install -e ".[dev]"
+```
+
+### Testing the Installation
+
+```bash
+# Test the MCP server starts correctly
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1.0.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | python -m hn_mcp_server
+
+# Run the direct API example
+python examples/direct_api_usage.py
 ```
 
 ### Testing
@@ -317,6 +392,60 @@ hn-mcp-server/
 ## API Rate Limits
 
 The HackerNews API has a rate limit of **10,000 requests/hour per IP**. The client includes built-in rate limiting to stay within these bounds.
+
+## Troubleshooting
+
+### Server Not Starting
+
+If the MCP server fails to start:
+
+1. **Check Python version**: Ensure you're using Python 3.11 or higher
+   ```bash
+   python --version
+   ```
+
+2. **Verify installation**: Make sure the package is installed correctly
+   ```bash
+   pip list | grep hn-mcp-server
+   ```
+
+3. **Test server directly**: Try initializing the server manually
+   ```bash
+   echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1.0.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | python -m hn_mcp_server
+   ```
+
+### Virtual Environment Issues
+
+If using a virtual environment with VS Code or Claude Desktop:
+
+1. **Use full path**: In your configuration file, use the full path to the Python executable:
+   ```json
+   {
+     "command": "/full/path/to/.venv/bin/python",
+     "args": ["-m", "hn_mcp_server"]
+   }
+   ```
+
+2. **Find Python path**: To get the full path to your virtual environment's Python:
+   ```bash
+   which python  # On Unix/macOS
+   where python  # On Windows
+   ```
+
+### MCP Client Examples Not Working
+
+The MCP client examples ([`basic_usage.py`](examples/basic_usage.py)) require the server subprocess to communicate via stdio. If you encounter issues:
+
+1. Use the **direct API examples** instead ([`direct_api_usage.py`](examples/direct_api_usage.py))
+2. Ensure you're using `sys.executable` in the client configuration (already updated in the examples)
+
+### API Errors
+
+If you encounter API errors:
+
+1. **Check network connectivity**: Ensure you can reach `hn.algolia.com`
+2. **Rate limiting**: Wait if you've exceeded the 10,000 requests/hour limit
+3. **Invalid item ID**: Ensure the item ID exists on HackerNews
 
 ## Contributing
 

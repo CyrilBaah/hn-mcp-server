@@ -38,7 +38,7 @@ async def search_hn(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def search_hn_by_date(
@@ -73,7 +73,7 @@ async def search_hn_by_date(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def get_front_page(
@@ -98,7 +98,7 @@ async def get_front_page(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def get_latest_stories(
@@ -123,7 +123,7 @@ async def get_latest_stories(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def get_latest_comments(
@@ -148,7 +148,7 @@ async def get_latest_comments(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def search_by_time_range(
@@ -192,7 +192,7 @@ async def search_by_time_range(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def search_by_metrics(
@@ -234,4 +234,4 @@ async def search_by_metrics(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)

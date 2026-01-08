@@ -19,7 +19,7 @@ async def get_user(username: str) -> dict[str, Any]:
     """
     async with HNClient() as client:
         user = await client.get_user(username)
-        return user.model_dump(by_alias=True)
+        return user.model_dump(mode='json', by_alias=True)
 
 
 async def get_user_stories(
@@ -46,7 +46,7 @@ async def get_user_stories(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
 
 
 async def get_user_comments(
@@ -73,4 +73,4 @@ async def get_user_comments(
             page=page,
             hits_per_page=hits_per_page,
         )
-        return result.model_dump(by_alias=True)
+        return result.model_dump(mode='json', by_alias=True)
