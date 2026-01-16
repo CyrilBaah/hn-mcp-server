@@ -20,7 +20,8 @@ The HackerNews MCP Server provides a Model Context Protocol interface to the Hac
 - **Type Safety**: Full type hints with MyPy strict mode
 - **Data Validation**: Pydantic models ensure data integrity
 - **Error Handling**: Comprehensive error handling and logging
-- **Stdio Transport**: MCP stdio protocol for easy integration
+- **Dual Transport**: Supports both stdio (local) and HTTP/SSE (cloud) modes
+- **Cloud Ready**: Deploy to Railway, fly.io, Render, AWS, Google Cloud
 
 ## Architecture
 
@@ -30,7 +31,7 @@ The HackerNews MCP Server provides a Model Context Protocol interface to the Hac
 ┌─────────────────────────────────────────┐
 │         MCP Client (Claude, etc.)       │
 └─────────────────┬───────────────────────┘
-                  │ stdio
+                  │ stdio or HTTP/SSE
                   │
 ┌─────────────────▼───────────────────────┐
 │          MCP Server (server.py)         │

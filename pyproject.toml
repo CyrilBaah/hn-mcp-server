@@ -1,6 +1,6 @@
 [project]
 name = "hn-mcp-server"
-version = "1.0.1"
+version = "1.1.0"
 description = "Model Context Protocol server for HackerNews API"
 authors = [
     {name = "Development Team"}
@@ -33,6 +33,11 @@ dev = [
     "pytest-httpx>=0.30.0",
     "ruff>=0.5.0",
     "mypy>=1.11.0",
+]
+http = [
+    "starlette>=0.37.0",
+    "uvicorn>=0.29.0",
+    "sse-starlette>=2.0.0",
 ]
 
 [project.urls]

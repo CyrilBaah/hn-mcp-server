@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Question or Discussion
+    url: https://github.com/CyrilBaah/hn-mcp-server/discussions
+    about: Ask questions or discuss ideas (coming soon)
+  - name: 📖 Documentation
+    url: https://github.com/CyrilBaah/hn-mcp-server#readme
+    about: Read the documentation
+  - name: 🐛 HackerNews API Issues
+    url: https://hn.algolia.com/api
+    about: For issues with the HackerNews API itself
