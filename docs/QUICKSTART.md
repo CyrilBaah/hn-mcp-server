@@ -4,7 +4,19 @@ This guide will help you get the HackerNews MCP Server up and running quickly.
 
 ## Installation
 
-### Option 1: Using pip (Recommended)
+### From PyPI (Recommended)
+
+**For local use (stdio mode):**
+```bash
+pip install hn-mcp-server
+```
+
+**For cloud deployment (HTTP mode):**
+```bash
+pip install hn-mcp-server[http]
+```
+
+### From Source
 
 ```bash
 # Clone the repository
@@ -19,7 +31,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
-### Option 2: Using uv (Faster)
+### Using uv (Faster)
 
 ```bash
 # Install uv
@@ -37,7 +49,9 @@ uv pip install -e ".[dev]"
 
 ## Configuration
 
-### For Claude Desktop
+### Stdio Mode (Local Desktop Clients)
+
+#### For Claude Desktop
 
 1. **Find your config file:**
    - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -49,28 +63,56 @@ uv pip install -e ".[dev]"
 {
   "mcpServers": {
     "hackernews": {
-      "command": "/absolute/path/to/venv/bin/python",
-      "args": ["-m", "hn_mcp_server.server"]
+      "command": "python",
+      "args": ["-m", "hn_mcp_server"]
     }
   }
 }
 ```
 
-3. **Get the absolute path to your Python:**
+3. **Restart Claude Desktop**
+
+### HTTP Mode (Cloud Deployment)
+
+#### Running Locally
 
 ```bash
-# macOS/Linux
-which python
+# Start HTTP server
+python -m hn_mcp_server --transport http --port 8000
 
-# Windows
-where python
+# Server endpoints:
+# - SSE: http://localhost:8000/sse
+# - Health: http://localhost:8000/health
 ```
 
-4. **Restart Claude Desktop**
+#### Client Configuration (HTTP)
+
+```json
+{
+  "mcpServers": {
+    "hackernews-remote": {
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+#### Docker Deployment
+
+```bash
+# Build and run with Docker
+docker build -t hn-mcp-server .
+docker run -p 8000:8000 hn-mcp-server
+
+# Or use docker-compose
+docker-compose up
+```
 
 ## Testing the Installation
 
-### Option 1: In Claude Desktop
+### Stdio Mode Testing
+
+#### Option 1: In Claude Desktop
 
 Ask Claude:
 ```
@@ -79,7 +121,7 @@ Search HackerNews for recent Python stories
 
 Claude should use the `search_hn` tool and return results.
 
-### Option 2: Command Line
+#### Option 2: Command Line
 
 ```bash
 # Activate your virtual environment
@@ -89,14 +131,22 @@ source venv/bin/activate
 python examples/basic_usage.py
 ```
 
-### Option 3: Test directly
+#### Option 3: Test MCP Protocol
 
 ```bash
-# Activate virtual environment
-source venv/bin/activate
+# Test that server responds to MCP protocol
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1.0.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | python -m hn_mcp_server
+```
 
-# Run the server (it will wait for input via stdio)
-python -m hn_mcp_server.server
+### HTTP Mode Testing
+
+```bash
+# Start server in one terminal
+python -m hn_mcp_server --transport http --port 8000
+
+# In another terminal, test health endpoint
+curl http://localhost:8000/health
+# Should return: OK
 ```
 
 ## Quick Examples

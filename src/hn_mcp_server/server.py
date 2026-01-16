@@ -4,6 +4,7 @@ A Model Context Protocol server that provides programmatic access to
 HackerNews content through the official HN Algolia API.
 """
 
+import argparse
 import asyncio
 import logging
 import os
@@ -14,6 +15,16 @@ from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 from .tools import items, search, users
+
+# Check if HTTP dependencies are available
+try:
+    from mcp.server.sse import SseServerTransport
+    from starlette.applications import Starlette
+    from starlette.routing import Route
+    
+    HTTP_AVAILABLE = True
+except ImportError:
+    HTTP_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
@@ -393,11 +404,96 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {e!s}")]
 
 
+async def run_stdio() -> None:
+    """Run the MCP server with stdio transport."""
+    async with stdio_server() as (read_stream, write_stream):
+        logger.info("Starting HackerNews MCP Server (stdio transport)")
+        await app.run(read_stream, write_stream, app.create_initialization_options())
+
+
+async def run_http(host: str = "0.0.0.0", port: int = 8000) -> None:
+    """Run the MCP server with HTTP/SSE transport."""
+    if not HTTP_AVAILABLE:
+        raise RuntimeError(
+            "HTTP transport requires additional dependencies. "
+            "Install with: pip install hn-mcp-server[http]"
+        )
+    
+    import uvicorn
+    from starlette.requests import Request
+    from starlette.responses import Response
+    
+    sse = SseServerTransport("/messages")
+    
+    async def handle_sse(request: Request) -> Response:
+        async with sse.connect_sse(
+            request.scope, request.receive, request._send
+        ) as streams:
+            await app.run(
+                streams[0], streams[1], app.create_initialization_options()
+            )
+        return Response()
+    
+    async def handle_health(_: Request) -> Response:
+        """Health check endpoint."""
+        return Response(content="OK", media_type="text/plain")
+    
+    starlette_app = Starlette(
+        routes=[
+            Route("/sse", endpoint=handle_sse),
+            Route("/health", endpoint=handle_health),
+        ]
+    )
+    
+    logger.info(f"Starting HackerNews MCP Server (HTTP/SSE transport) on {host}:{port}")
+    logger.info(f"SSE endpoint: http://{host}:{port}/sse")
+    logger.info(f"Health check: http://{host}:{port}/health")
+    
+    config = uvicorn.Config(
+        starlette_app,
+        host=host,
+        port=port,
+        log_level="info"
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="HackerNews MCP Server - Access HackerNews via Model Context Protocol"
+    )
+    parser.add_argument(
+        "--transport",
+        type=str,
+        choices=["stdio", "http"],
+        default="stdio",
+        help="Transport mode: stdio (default) or http"
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="0.0.0.0",
+        help="Host to bind to (HTTP mode only, default: 0.0.0.0)"
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port to bind to (HTTP mode only, default: 8000)"
+    )
+    return parser.parse_args()
+
+
 async def main() -> None:
     """Run the MCP server."""
-    async with stdio_server() as (read_stream, write_stream):
-        logger.info("Starting HackerNews MCP Server")
-        await app.run(read_stream, write_stream, app.create_initialization_options())
+    args = parse_args()
+    
+    if args.transport == "http":
+        await run_http(host=args.host, port=args.port)
+    else:
+        await run_stdio()
 
 
 if __name__ == "__main__":

@@ -20,13 +20,21 @@ A Model Context Protocol (MCP) server that provides programmatic access to Hacke
 - ⚡ **High Performance**: Async/await design with connection pooling and retry logic
 - 🛡️ **Type Safe**: Full Pydantic validation and type hints throughout
 - 🔧 **MCP Compatible**: Works with Claude Desktop, Continue, and other MCP clients
+- 🌐 **Dual Transport**: Supports both stdio (local) and HTTP/SSE (cloud) modes
+- ☁️ **Cloud Ready**: Deploy to Railway, fly.io, Render, AWS Lambda, Google Cloud Run
 
 ## Installation
 
 ### From PyPI (Recommended)
 
+**Stdio mode (default - for local use):**
 ```bash
 pip install hn-mcp-server
+```
+
+**HTTP/SSE mode (for cloud deployment):**
+```bash
+pip install hn-mcp-server[http]
 ```
 
 ### From Source
@@ -45,9 +53,11 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-### Testing the Server
+### Stdio Mode (Local Desktop Clients)
 
-First, verify the server is working correctly:
+The default mode for local MCP clients like Claude Desktop and Cursor.
+
+**Testing the Server:**
 
 ```bash
 # Test that the server responds to MCP protocol
@@ -171,6 +181,59 @@ Add to your Claude Desktop configuration file:
 ```
 
 Restart Claude Desktop, and the HackerNews tools will be available.
+
+### HTTP/SSE Mode (Cloud Deployment)
+
+For deploying to cloud platforms or accessing from remote clients.
+
+**Installation:**
+```bash
+pip install hn-mcp-server[http]
+```
+
+**Running HTTP Server:**
+```bash
+# Default: runs on 0.0.0.0:8000
+python -m hn_mcp_server --transport http
+
+# Custom host and port
+python -m hn_mcp_server --transport http --host 127.0.0.1 --port 3000
+```
+
+**Endpoints:**
+- SSE: `http://localhost:8000/sse` - MCP communication
+- Health: `http://localhost:8000/health` - Health check
+
+**Client Configuration (HTTP):**
+```json
+{
+  "mcpServers": {
+    "hackernews-remote": {
+      "url": "https://your-server.example.com/sse"
+    }
+  }
+}
+```
+
+**Docker Deployment:**
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+RUN pip install hn-mcp-server[http]
+
+EXPOSE 8000
+CMD ["python", "-m", "hn_mcp_server", "--transport", "http"]
+```
+
+**Deploy to Railway/Render/fly.io:**
+```bash
+# Set environment variable
+TRANSPORT=http
+
+# Start command
+python -m hn_mcp_server --transport http --port $PORT
+```
 
 ### Standalone Usage
 
@@ -550,7 +613,7 @@ See [docs/PUBLISHING.md](docs/PUBLISHING.md) for detailed instructions.
 1. **Update version** in [`pyproject.toml`](pyproject.toml):
    ```toml
    [project]
-   version = "1.0.1"  # Increment appropriately
+   version = "1.1.0"  # Increment appropriately
    ```
 
 2. **Clean previous builds**:
@@ -575,8 +638,8 @@ See [docs/PUBLISHING.md](docs/PUBLISHING.md) for detailed instructions.
 
 6. **Create a git tag**:
    ```bash
-   git tag -a v1.0.1 -m "Release version 1.0.1"
-   git push origin v1.0.1
+   git tag -a v1.1.0 -m "Release version 1.1.0"
+   git push origin v1.1.0
    ```
 
 ### Using API Tokens (Recommended)
@@ -617,6 +680,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🚀 [Quick Start Guide](docs/QUICKSTART.md)
 - 🐛 [Issue Tracker](https://github.com/CyrilBaah/hn-mcp-server/issues)
 - 💬 [Discussions](https://github.com/CyrilBaah/hn-mcp-server/discussions)
+
+---
+
+**Available on PyPI**: `pip install hn-mcp-server`
 
 ---
 
