@@ -1,19 +1,22 @@
-name: Publish to PyPI
+name: Release and Publish
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  build-and-publish:
+  release-and-publish:
     runs-on: ubuntu-latest
     permissions:
       id-token: write  # Required for trusted publishing
-      contents: read
+      contents: write  # Required for creating releases
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -30,6 +33,29 @@ jobs:
     
     - name: Check distribution
       run: twine check dist/*
+    
+    - name: Extract version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Extract changelog for this version
+      id: changelog
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        awk "/## \[$VERSION\]/,/## \[.*\]/{if(/## \[.*\]/ && !/## \[$VERSION\]/)exit;print}" CHANGELOG.md > release_notes.md
+        if [ ! -s release_notes.md ]; then
+          echo "Release version $VERSION" > release_notes.md
+        fi
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
